@@ -20,7 +20,4 @@ class Booking(models.Model):
 # YYYY-MM-DD
 
 # TimeField
-# '14:30:59'
-# '14:30'
-
-# '# days'
+# HH-MM

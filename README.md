@@ -35,3 +35,18 @@ A bus company wants to start using technology and allow their users to book onli
 Once you're done, please send us an email to [tech@ada-school.org](mailto:tech@ada-school.org) with the subject: TECH_CHALLENGE_[YOUR NAME] and do not forget to include the link to your repository with the solution. After you submit your code, we will review it and contact you to discuss next steps. 
 
 Good luck! 💪
+
+
+# How to use the API.
+
+```bash
+$ pip install -r requirements.txt
+```
+
+* Use Postman, Insomnia or your favourite API client.
+
+* 127.0.0.1:8000/ada/   for all available urls.
+
+* For **departure_date** use the format *YYYY-MM-DD*
+
+* For **time_departure** use the 24h format *HH-MM*
