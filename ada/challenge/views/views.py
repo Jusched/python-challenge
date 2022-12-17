@@ -1,44 +1,71 @@
 # Django and Django Rest modules
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework import serializers, status
-from django.http import Http404
+from rest_framework import status, serializers
+from django.shortcuts import get_object_or_404
 
 # Local modules
 from ..models import Booking
 from ..serializers import BookingSerializer
 
 
-class BookingView:
+@api_view(["GET"])
+def ApiView(request):
+    api_urls= {
+        'View': "view/pk/",
+        'Add': 'create/',
+        'Update': 'update/pk/',
+        'Delete': 'delete/pk/',
+    }
+    
+    return Response(api_urls)
 
-    def post(self, request):
-        serializer = BookingSerializer(data=request.data)
-        
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)    
+@api_view(["GET"])
+def view_booking(request, pk):
 
-class BookingDetail:
-    def get_object(self, pk):
-        """Retrieve, update or delete."""
+    booking = Booking.objects.get(pk=pk)
+    serializer = BookingSerializer(booking)
 
-        try:
-            bookings = Booking.objects.get(pk=pk)
-        except Booking.DoesNotExist:
-            raise Http404
-
-    def get(self, request, pk):
-        booking = self.get_object(pk)
-        serializer = BookingSerializer(booking)
-
+    if booking:
         return Response(serializer.data)
+    else:
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
-    def put(self, request, pk):
-        booking = self.get_object(pk)
-        serializer = BookingSerializer(booking, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+def add_booking(request):
+
+    booking = BookingSerializer(data=request.data)
+
+    if Booking.objects.filter(**request.data).exists():
+        raise serializers.ValidationError("This booking already exists.")
+
+    if booking.is_valid():
+        booking.save()
+        return Response(booking.data)
+    else:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['PUT'])
+def update_booking(request, pk):
+
+    booking= Booking.objects.get(pk=pk)
+    data= BookingSerializer(instance=booking, data=request.data)
+
+    if data.is_valid():
+        data.save()
+        return Response(data.data)
+    else:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['DELETE'])
+def delete_booking(request, pk):
+
+    booking= get_object_or_404(Booking, pk=pk)
+    booking.delete()
+    return Response(status=status.HTTP_202_ACCEPTED)
+
